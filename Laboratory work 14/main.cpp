@@ -29,7 +29,7 @@ public:
 
 void Factorial(unsigned long long int mas[N], int n)
 {
-	for (int i = 0; i < n; i++)
+	for (int i = 0; i <= n - 1; i++)
 	{
 		unsigned long long int fac_i = 1;
 
