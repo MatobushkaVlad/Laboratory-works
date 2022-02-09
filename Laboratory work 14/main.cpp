@@ -29,37 +29,31 @@ public:
 
 void Factorial(unsigned long long int mas[N], int n)
 {
-	for (int i = 0; i <= n - 1; i++)
+
+	for (int i = 0; i < n; i++)
 	{
 		unsigned long long int fac_i = 1;
 
 		if (mas[i] == 0)
 			fac_i = 0;
-		else 
-		{
-			for (int j = mas[i]; j > 0; j--)
-			{
-				fac_i = fac_i * j;
-			}
-		} 
-		//mas[i] = fac_i; //при необходимости вывода массива раскомментировать
+
+		for (int j = 1; j <= mas[i]; j++)
+			fac_i = fac_i * j;
 	}
+
 }
 
 int main()
 {
 	unsigned long long int mas[N];
 	for (int i = 0; i < N; i++)
-		mas[i] = rand() % 30;
+		mas[i] = rand();
 
 	Timer t;
 
 	Factorial(mas, N);
 
 	std::cout << "Time: " << t.elapsed() << std::endl;
-
-	/*for (int i = 0; i < N; i++)
-		std::cout << mas[i] << std::endl; */ //при необходимости вывода массива раскомментировать
 
 	return 0;
 }
