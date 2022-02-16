@@ -1,6 +1,6 @@
 #include <iostream>
 #include <chrono>
-#define N 10
+const int N = 100000;
 
 class Timer
 {
@@ -31,16 +31,20 @@ void QUICKSORT(int a, int b, int mas[N])
 {
 	if (a >= b)
 		return;
-	int m = 4;//rand() % ((b - a + 1) + a);
+	int m = (a + b) / 2 + 1;
 	int k = mas[m];
 	int l = a - 1;
 	int r = b + 1;
-	while(l < r)
+	while(1)
 	{
-		while (mas[l] < k)
-			l = l + 1;
-		while (mas[r] > k)
-			r = r - 1;
+		do
+		{
+			l++;
+		} while (mas[l] < k);
+		do
+		{
+			r--;
+		} while (mas[r] > k);
 		if (l >= r)
 			break;
 		std::swap(mas[l], mas[r]);
@@ -61,7 +65,6 @@ void BUBBLESORT(int mas[N], int n)
 				std::swap(mas[j], mas[j + 1]);
 				continue;
 			}
-		
 	}
 }
 
@@ -69,7 +72,7 @@ int main()
 {
 	int mas[N];
 	int a = 0;
-	int b = sizeof(mas);
+	int b = N-1;
 
 	for (int i = 0; i < N; i++)
 		mas[i] = rand();
@@ -81,8 +84,8 @@ int main()
 
 	std::cout << "Time: " << t.elapsed() << std::endl;
 
-	for (int i = 0; i < N; i++)
-		std::cout << mas[i] << std::endl;
+	//for (int i = 0; i < N; i++)
+		//std::cout << mas[i] << std::endl;
 
 	return 0;
 }
