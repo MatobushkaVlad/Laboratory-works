@@ -57,14 +57,19 @@ void QUICKSORT(int a, int b, int mas[N])
 
 void BUBBLESORT(int mas[N], int n)
 {
+	bool swapped = false;
 	for (int i = 0; i < n - 1; i++)
 	{
-		for(int j = 0; j < n - 1 - i; j++)
+		for (int j = 0; j < n - 1 - i; j++)
+		{
 			if (mas[j] > mas[j + 1])
 			{
 				std::swap(mas[j], mas[j + 1]);
-				continue;
+				swapped = true;
 			}
+		}
+		if (swapped == false)
+			break;
 	}
 }
 
@@ -79,8 +84,8 @@ int main()
 
 	Timer t;
 
-	//BUBBLESORT(mas, N);
-	QUICKSORT(a, b, mas);
+	BUBBLESORT(mas, N);
+	//QUICKSORT(a, b, mas);
 
 	std::cout << "Time: " << t.elapsed() << std::endl;
 
