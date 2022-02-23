@@ -51,14 +51,24 @@ int Binary_Search(int mas[], int left, int right, int k)
 		return 0;
 }
 
-double Funcion(double x)
+double Function(double x)
 {
 	return sin(2*x + 3);
 }
 
 double Bisection(double left, double right)
 {
-	double f_left = Function(left);
+	double eps = 1e-4;
+	while (1)
+	{
+		double x = (left + right) / 2;
+		if ((abs(x - left) < eps) & (abs(x - right) < eps))
+			return x;
+		else if (Function(x) * Function(left) > 0)
+			left = x;
+		else
+			right = x;
+	}
 }
 
 int main()
@@ -67,7 +77,9 @@ int main()
 	int a = 0;
 	int b = N-1;
 	int k = 0;
-	
+	double left = 0;
+	double right = 1;
+
 	for (int i = 0; i < N; i++)
 		mas[i] = i;
 
@@ -76,13 +88,9 @@ int main()
 
 	Timer t;
 
-	/*for (int i = 0; i < N; i++)
-	{
-		if (mas[i] == k)
-			std::cout << i << std::endl;
-	} */
+	std::cout << Binary_Search(mas, a, b, k) << std::endl;
 
-	//std::cout << Binary_Search(mas, a, b, k) << std::endl;
+	std::cout << "x = " << Bisection(left, right) << std::endl;
 
 	std::cout << "Time: " << t.elapsed() << std::endl;
 
