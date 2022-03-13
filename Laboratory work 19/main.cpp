@@ -66,23 +66,22 @@ void print(List* head)
 	}
 }
 
- 
 void maxel(List* head)
 {
 	List* p = head->next;
 	List* q = p->next;
-	int d;
+	int m;
 	while (p->next->next != nullptr)
 	{
 		if (q > p)
 		{
-			d = q->number;
+			m = q->number;
 			q = q->next;
 			p = p->next;
 		}
 		p = p->next;
 	}
-	//std::cout << d << std::endl;
+	//std::cout << m << std::endl;
 }
 
 int main()
@@ -90,6 +89,7 @@ int main()
 	List* head = new List;
 	head->next = nullptr;
 
+	//Задание списка
 	int d;
 
 	for (int i = 0; i < N; i++)
@@ -99,12 +99,40 @@ int main()
 	}
 
 	//print(head);
+
+	//Задание массива
+	int mas[N];
+	int j = 0;
+
+	for (int i = 0; i < N; i++)
+	{
+		mas[i] = rand();
+	}
+
 	std::cout << "=========================" << std::endl;
 
 	Timer t;
 
-	for(int i = 0; i < M; i++)
+	for (int i = 0; i < M; i++)
+	{
+		//Измерения для массива
+		while (j < M - 1)
+		{
+			int max;
+			if (mas[j + 1] > mas[j])
+			{
+				max = mas[j + 1];
+				j++;
+			}
+			j++;
+		}
+	} 
+
+	/*for (int i = 0; i < M; i++)
+	{
+		//Измерения для списка
 		maxel(head);
+	} */
 
 	std::cout << "Time: " << t.elapsed() << std::endl;
 
