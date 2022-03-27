@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include "stdafx.h"
 
 struct Tree
 {
@@ -9,7 +10,7 @@ struct Tree
 	Tree* parent;
 };
 
-//Создание
+//????????
 Tree* Make(int data, Tree* p)
 {
 	Tree* q = new Tree;
@@ -20,7 +21,7 @@ Tree* Make(int data, Tree* p)
 	return q;
 }
 
-//Добавление
+//??????????
 void Add(int data, Tree*& root)
 {
 	if (root == nullptr)
@@ -37,23 +38,23 @@ void Add(int data, Tree*& root)
 	if (data == v->data)
 		return;
 	Tree* u = Make(data, v);
-		if (data < v->data)
-			v->left = u;
-		else
-			v->right = u;
+	if (data < v->data)
+		v->left = u;
+	else
+		v->right = u;
 }
 
-//Вывод
+//?????
 void Output(Tree* v)
 {
 	if (v == nullptr)
 		return;
 	Output(v->left);
-		std::cout << v->data << std::endl;
+	std::cout << v->data << std::endl;
 	Output(v->right);
 }
 
-//Поиск
+//?????
 Tree* Search(int data, Tree* v)
 {
 	if (v == nullptr)
@@ -66,7 +67,7 @@ Tree* Search(int data, Tree* v)
 		return Search(data, v->right);
 }
 
-//Удаление
+//????????
 void Delete(int data, Tree*& root)
 {
 	Tree* u = Search(data, root);
@@ -81,7 +82,7 @@ void Delete(int data, Tree*& root)
 	if (u->left == nullptr && u->right != nullptr && u == root)
 	{
 		Tree* t = u->right;
-		while (t -> left != nullptr)
+		while (t->left != nullptr)
 			t = t->left;
 		u->data = t->data;
 		u = t;
@@ -116,8 +117,31 @@ void Delete(int data, Tree*& root)
 	delete u;
 }
 
+void Search(int data, Tree* v, int number)
+{
+	std::ofstream out("output.txt");
+	if (v == nullptr)
+	{
+		std::cout << data << " - n";
+		out << data << " - n";
+		return;
+	}
+	else if (v->data == data)
+	{
+		std::cout << data << " - " << number;
+		out << data << " - " <<  number;
+		return;
+	}
+	else if (data < v->data)
+		Search(data, v->left, number + 1);
+	else
+		Search(data, v->right, number + 1);
+	
+}
+
 int main()
 {
+	Tree* root = nullptr;
 	std::ifstream file;
 	file.open("input.txt");
 	if (!file.is_open())
@@ -125,10 +149,27 @@ int main()
 	else
 	{
 		std::cout << "File is open" << std::endl;
-		char ch;
-		while (file.get(ch))
+		char a;
+		int b;
+		while (!file.eof())
 		{
-			std::cout << ch;
+			file >> a;
+			file >> b;
+			if (a == '+')
+			{
+				Add(b, root);
+			}
+			else if (a == '-')
+			{
+				Delete(b, root);
+			}
+			else if (a == '?')
+			{
+				Search(b, root, 1);
+				std::cout << '\n';
+			}
+			else if (a == 'E')
+				break;
 		}
 	}
 
