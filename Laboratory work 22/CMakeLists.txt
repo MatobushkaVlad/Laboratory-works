@@ -12,5 +12,4 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 include_directories(inc)
 
-add_executable(${PROJECT_NAME}  input.txt
-				main.cpp)
+add_executable(${PROJECT_NAME} main.cpp)
