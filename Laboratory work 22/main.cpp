@@ -1,13 +1,5 @@
 #include <iostream>
 
-class Test
-{
-
-	// конструктор по умолчанию
-	// деструктор по умолчанию
-	// конструктор копирования по умолчанию
-};
-
 class Matrix
 {
 	// Абстракция
@@ -58,7 +50,8 @@ public:
 	}
 
 	// Оператор сложения
-	Matrix operator+(const Matrix& mat) {
+	Matrix operator+(const Matrix& mat)
+	{
 		std::cout << "operator+" << std::endl;
 		Matrix tmp(m_n, m_m);
 		for (int i = 0; i < m_n; i++)
@@ -68,7 +61,8 @@ public:
 	}
 
 	// Оператор вычитания !Не проверенный!
-	Matrix operator-(const Matrix& mat) {
+	Matrix operator-(const Matrix& mat) 
+	{
 		std::cout << "operator-" << std::endl;
 		Matrix tmp(m_n, m_m);
 		for (int i = 0; i < m_n; i++)
@@ -77,16 +71,90 @@ public:
 		return tmp;
 	}
 
-	// Оператор умножения !Не рабочий!
-	Matrix operator*(const Matrix& mat) {
+	// Оператор умножения !Не проверенный!
+	Matrix operator*(const Matrix& mat) 
+	{
 		std::cout << "operator*" << std::endl;
 		Matrix tmp(m_n, mat.m_m);
 		for (int i = 0; i < m_n; i++)
-		{
-			int count = 0;
 			for (int j = 0; j < mat.m_m; j++)
-				tmp.m_mat[i][j] += m_mat[i][j] * mat.m_mat[i][j];
+			{
+				tmp.m_mat[i][j] = 0;
+				for (int t = 0; t < mat.m_n; t++)
+				{
+					tmp.m_mat[i][j] += m_mat[i][t] * mat.m_mat[t][j];
+				}
+			}
+		return tmp;
+	}
+
+	//Метод для поиска определителя
+	double Det()
+	{
+		if (m_n != m_m)
+		{
+			std::cout << "Операция не поддерживается!" << std::endl;
 		}
+
+		else if (m_n == m_m)
+		{
+			if (m_n == 2)
+			{
+				double d = 0;
+				d = (m_mat[0][0]*m_mat[1][1] - m_mat[0][1]*m_mat[1][0]);
+				return d;
+			}
+			else if (m_n == 3)
+			{
+				double d = 0;
+				d = (m_mat[0][0] * m_mat[1][1] * m_mat[2][2] + m_mat[1][0] * m_mat[2][1] * m_mat[0][2] + m_mat[0][1] * m_mat[1][2] * m_mat[2][0] - m_mat[0][2] * m_mat[1][1] * m_mat[2][0] - m_mat[1][2] * m_mat[2][1] * m_mat[0][0] - m_mat[0][1] * m_mat[1][0] * m_mat[2][2]);
+				return d;
+			}
+		}
+	}
+
+	Matrix Reverse()
+	{
+		int det = Det();
+		Matrix tmp(m_n, m_m);
+		if (det == 0)
+		{
+			std::cout << "Обратной матрицы не существует!" << std::endl;
+		}
+		else if (m_n == m_m)
+		{
+			if (m_n == 2)
+			{
+				tmp.m_mat[0][0] = m_mat[1][1] / det;
+				tmp.m_mat[1][1] = m_mat[0][0] / det;
+				tmp.m_mat[1][0] = -(m_mat[1][0] / det);
+				tmp.m_mat[0][1] = -(m_mat[0][1] / det);
+				return tmp;
+			}
+			else if (m_n == 3)
+			{
+				tmp.m_mat[0][0] = (m_mat[1][1] * m_mat[2][2] - m_mat[2][1] * m_mat[1][2]) / det;
+				tmp.m_mat[1][0] = -(m_mat[1][0] * m_mat[2][2] - m_mat[2][0] * m_mat[1][2]) / det;
+				tmp.m_mat[2][0] = (m_mat[1][0] * m_mat[2][1] - m_mat[2][0] * m_mat[1][1]) / det;
+				tmp.m_mat[0][1] = -(m_mat[0][1] * m_mat[2][2] - m_mat[2][1] * m_mat[0][2]) / det;
+				tmp.m_mat[1][1] = (m_mat[0][0] * m_mat[2][2] - m_mat[2][0] * m_mat[0][2]) / det;
+				tmp.m_mat[2][1] = -(m_mat[0][0] * m_mat[2][1] - m_mat[2][0] * m_mat[0][1]) / det;
+				tmp.m_mat[0][2] = (m_mat[0][1] * m_mat[1][2] - m_mat[1][1] * m_mat[0][2]) / det;
+				tmp.m_mat[1][2] = -(m_mat[0][0] * m_mat[1][2] - m_mat[1][0] * m_mat[0][2]) / det;
+				tmp.m_mat[2][2] = (m_mat[0][0] * m_mat[1][1] - m_mat[1][0] * m_mat[0][1]) / det;
+				return tmp;
+			}
+		}
+	}
+	
+	Matrix Transp()
+	{
+		Matrix tmp(m_n, m_m);
+		for(int i = 0; i < m_n; i++)
+			for (int j = 0; j < m_m; j++)
+			{
+				tmp.m_mat[i][j] = m_mat[j][i];
+			}
 		return tmp;
 	}
 
@@ -132,31 +200,32 @@ std::ostream& operator<<(std::ostream& out, const Matrix& mat)
 	return out;
 }
 
-void print(Matrix& mat)
-{
-	std::cout << "111" << std::endl;
-}
-
 int main()
 {
-	Test test;
-
-	Matrix A(2, 3);
+	
+	Matrix A(2, 2);
 
 	std::cin >> A;
-	std::cout << A << std::endl; // std::cout << "Matrix " << mat.m_n << "x" << mat.m_m << mat.m_mat[0][0] << mat.m_mat[0][1] << ....
+	//std::cout << A << std::endl; // std::cout << "Matrix " << mat.m_n << "x" << mat.m_m << mat.m_mat[0][0] << mat.m_mat[0][1] << ....
 
-	Matrix B(2, 3);
+	Matrix B(2, 2);
 	std::cin >> B;
-	std::cout << B << std::endl;
+	//std::cout << B << std::endl;
 
-	Matrix C(2, 3);
-	C = A + B;
+	Matrix C(2, 2);
 
-	std::cout << C << std::endl;
+	/*C = A + B;
+	std::cout << C << std::endl; */
+
+	/*C = A - B;
+	std::cout << C << std::endl; */
 
 	C = A * B;
 	std::cout << C << std::endl;
+	std::cout << C.Det() << std::endl;
+	std::cout << C.Reverse() << std::endl;
+	std::cout << C.Transp() << std::endl;
+
 
 	return 0;
 }
