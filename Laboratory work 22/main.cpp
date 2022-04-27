@@ -1,95 +1,99 @@
 #include <iostream>
 
+template<typename T, int N, int M>
 class Matrix
 {
-	// Абстракция
-	// Инкапсуляция
-	// Использование вне класса
 public:
+
+	int getN() { return m_n; }
+	int getM() { return m_m; }
+	T get(int i, int j) { return m_mat[i][j]; }
+	void set(int i, int j, T data) { m_mat[i][j] = data; }
+
 	// Конструктор
-	Matrix(int n, int m)
+	Matrix()
 	{
 		std::cout << "Constructor" << std::endl;
-		m_n = n;
-		m_m = m;
-		m_mat = new int* [m_n];
+		m_n = N;
+		m_m = M;
 		for (int i = 0; i < m_n; i++)
-			m_mat[i] = new int[m_m];
+			for (int j = 0; j < m_m; j++)
+				m_mat[i][j] = 0;
 	}
 
 	// Конструктор копирования
-	Matrix(const Matrix& mat)
+	Matrix(const Matrix<T, N, M>& mat)
 	{
 		std::cout << "Copy constructor" << std::endl;
 
-		m_n = mat.m_n;
-		m_m = mat.m_m;
-
-		m_mat = new int* [m_n];
-		for (int i = 0; i < m_n; i++)
-			m_mat[i] = new int[m_m];
+		m_n = mat.getN();
+		m_m = mat.getM();
 
 		for (int i = 0; i < m_n; i++)
 			for (int j = 0; j < m_m; j++)
-				m_mat[i][j] = mat.m_mat[i][j];
+				m_mat[i][j] = mat.get(i, j);
 	}
 
 	// Присваивание
-	Matrix& operator=(const Matrix& mat)
+	template<typename T, int N, int M>
+	Matrix<T, N, M>& operator=(const Matrix<T, N, M>& mat)
 	{
 		std::cout << "Operator =" << std::endl;
 
-		m_n = mat.m_n;
-		m_m = mat.m_m;
+		m_n = mat.getN();
+		m_m = mat.getM();
 
 		for (int i = 0; i < m_n; i++)
 			for (int j = 0; j < m_m; j++)
-				m_mat[i][j] = mat.m_mat[i][j];
+				m_mat[i][j] = mat.get(i, j);
 
 		return *this;
 	}
 
 	// Оператор сложения
-	Matrix operator+(const Matrix& mat)
+	template<typename T, int N, int M>
+	Matrix<T, N, M> operator+(const Matrix<T, N, M>& mat)
 	{
 		std::cout << "operator+" << std::endl;
-		Matrix tmp(m_n, m_m);
+		Matrix<T, N, M> tmp;
 		for (int i = 0; i < m_n; i++)
 			for (int j = 0; j < m_m; j++)
-				tmp.m_mat[i][j] = m_mat[i][j] + mat.m_mat[i][j];
+				tmp.m_mat[i][j] = m_mat[i][j] + mat.get(i, j);
 		return tmp;
 	}
 
 	// Оператор вычитания !Не проверенный!
-	Matrix operator-(const Matrix& mat) 
+	template<typename T, int N, int M>
+	Matrix<T, N, M> operator-(const Matrix<T, N, M>& mat) 
 	{
 		std::cout << "operator-" << std::endl;
-		Matrix tmp(m_n, m_m);
+		Matrix<T, N, M> tmp;
 		for (int i = 0; i < m_n; i++)
 			for (int j = 0; j < m_m; j++)
-				tmp.m_mat[i][j] = m_mat[i][j] - mat.m_mat[i][j];
+				tmp.m_mat[i][j] = m_mat[i][j] - mat.get(i, j);
 		return tmp;
 	}
 
 	// Оператор умножения !Не проверенный!
-	Matrix operator*(const Matrix& mat) 
+	template<typename T, int N, int M>
+	Matrix<T, N, M> operator*(const Matrix<T, N, M>& mat) 
 	{
 		std::cout << "operator*" << std::endl;
-		Matrix tmp(m_n, mat.m_m);
+		Matrix<T, N, M> tmp;
 		for (int i = 0; i < m_n; i++)
-			for (int j = 0; j < mat.m_m; j++)
+			for (int j = 0; j < mat.getM(); j++)
 			{
 				tmp.m_mat[i][j] = 0;
-				for (int t = 0; t < mat.m_n; t++)
+				for (int t = 0; t < mat.getN(); t++)
 				{
-					tmp.m_mat[i][j] += m_mat[i][t] * mat.m_mat[t][j];
+					tmp.m_mat[i][j] += m_mat[i][t] * mat.get(t, j);
 				}
 			}
 		return tmp;
 	}
 
 	//Метод для поиска определителя
-	double Det()
+	T Det()
 	{
 		if (m_n != m_m)
 		{
@@ -100,23 +104,23 @@ public:
 		{
 			if (m_n == 2)
 			{
-				double d = 0;
+				T d = 0;
 				d = (m_mat[0][0]*m_mat[1][1] - m_mat[0][1]*m_mat[1][0]);
 				return d;
 			}
 			else if (m_n == 3)
 			{
-				double d = 0;
+				T d = 0;
 				d = (m_mat[0][0] * m_mat[1][1] * m_mat[2][2] + m_mat[1][0] * m_mat[2][1] * m_mat[0][2] + m_mat[0][1] * m_mat[1][2] * m_mat[2][0] - m_mat[0][2] * m_mat[1][1] * m_mat[2][0] - m_mat[1][2] * m_mat[2][1] * m_mat[0][0] - m_mat[0][1] * m_mat[1][0] * m_mat[2][2]);
 				return d;
 			}
 		}
 	}
 
-	Matrix Reverse()
+	Matrix<double, N, M> Reverse()
 	{
-		int det = Det();
-		Matrix tmp(m_n, m_m);
+		T det = Det();
+		Matrix<double, N, M> tmp;
 		if (det == 0)
 		{
 			std::cout << "Обратной матрицы не существует!" << std::endl;
@@ -147,9 +151,9 @@ public:
 		}
 	}
 	
-	Matrix Transp()
+	Matrix<T, N, M> Transp()
 	{
-		Matrix tmp(m_n, m_m);
+		Matrix<T, N, M> tmp;
 		for(int i = 0; i < m_n; i++)
 			for (int j = 0; j < m_m; j++)
 			{
@@ -168,33 +172,35 @@ public:
 	}
 
 	// friend - позволяет функции иметь доступ к private полям/методам класса
-	friend std::istream& operator>>(std::istream& os, Matrix& mat);
-	friend std::ostream& operator<<(std::ostream& os, const Matrix& mat);
+	template<typename T, int N, int M>
+	friend std::istream& operator>>(std::istream& os, Matrix<T, N, M>& mat);
+	template<typename T, int N, int M>
+	friend std::ostream& operator<<(std::ostream& os, const Matrix<T, N, M>& mat);
 
 	// Использование внутри класса
 private:
 	int m_n, m_m;		// Поле
-	int n;
-	int** m_mat;
+	T m_mat[N][M];
 };
 
 // Перегрузка оператора ввода
-// 
-std::istream& operator>>(std::istream& in, Matrix& mat)
+template<typename T, int N, int M>
+std::istream& operator>>(std::istream& in, Matrix<T, N, M>& mat)
 {
-	for (int i = 0; i < mat.m_n; i++)
-		for (int j = 0; j < mat.m_m; j++)
-			in >> mat.m_mat[i][j];
+	for (int i = 0; i < mat.getN(); i++)
+		for (int j = 0; j < mat.getM(); j++)
+			in >> mat.get(i, j);
 	return in;
 }
 
 // Перегрузка оператора вывода
-std::ostream& operator<<(std::ostream& out, const Matrix& mat)
+template<typename T, int N, int M>
+std::ostream& operator<<(std::ostream& out, const Matrix<T, N, M>& mat)
 {
-	out << "Matrix " << mat.m_n << "x" << mat.m_m << std::endl;
-	for (int i = 0; i < mat.m_n; i++) {
-		for (int j = 0; j < mat.m_m; j++)
-			out << mat.m_mat[i][j] << " ";
+	out << "Matrix " << mat.getN() << "x" << mat.getM() << std::endl;
+	for (int i = 0; i < mat.getN(); i++) {
+		for (int j = 0; j < mat.getM(); j++)
+			out << mat.get(i, j) << " ";
 		out << std::endl;
 	}
 	return out;
@@ -203,27 +209,37 @@ std::ostream& operator<<(std::ostream& out, const Matrix& mat)
 int main()
 {
 	
-	Matrix A(2, 2);
+	Matrix<double, 2, 2> A;
 
 	std::cin >> A;
 	//std::cout << A << std::endl; // std::cout << "Matrix " << mat.m_n << "x" << mat.m_m << mat.m_mat[0][0] << mat.m_mat[0][1] << ....
 
-	Matrix B(2, 2);
+	Matrix<double, 2, 2> B;
 	std::cin >> B;
 	//std::cout << B << std::endl;
 
-	Matrix C(2, 2);
+	Matrix<double, 2, 2> C;
 
-	/*C = A + B;
-	std::cout << C << std::endl; */
+	C = A + B;
+	std::cout << C << std::endl;
 
-	/*C = A - B;
-	std::cout << C << std::endl; */
+	std::cout << "------------------------------------------" << std::endl;
+
+	C = A - B;
+	std::cout << C << std::endl;
+
+	std::cout << "-------------------------------------------" << std::endl;
 
 	C = A * B;
 	std::cout << C << std::endl;
+
+	std::cout << "Determinant" << std::endl;
 	std::cout << C.Det() << std::endl;
+
+	std::cout << "Reverse" << std::endl;
 	std::cout << C.Reverse() << std::endl;
+
+	std::cout << "Transp" << std::endl;
 	std::cout << C.Transp() << std::endl;
 
 
