@@ -52,40 +52,55 @@ public:
 	// Оператор сложения
 	Matrix operator+(const Matrix& mat)
 	{
-		std::cout << "operator+" << std::endl;
-		Matrix tmp(m_n, m_m);
-		for (int i = 0; i < m_n; i++)
-			for (int j = 0; j < m_m; j++)
-				tmp.m_mat[i][j] = m_mat[i][j] + mat.m_mat[i][j];
-		return tmp;
+		if ((m_n == mat.m_n) && (m_m == mat.m_m))
+		{
+			std::cout << "operator+" << std::endl;
+			Matrix tmp(m_n, m_m);
+			for (int i = 0; i < m_n; i++)
+				for (int j = 0; j < m_m; j++)
+					tmp.m_mat[i][j] = m_mat[i][j] + mat.m_mat[i][j];
+			return tmp;
+		}
+		else
+			std::cout << "Некорректная матрица!"
 	}
 
 	// Оператор вычитания !Не проверенный!
 	Matrix operator-(const Matrix& mat) 
 	{
-		std::cout << "operator-" << std::endl;
-		Matrix tmp(m_n, m_m);
-		for (int i = 0; i < m_n; i++)
-			for (int j = 0; j < m_m; j++)
-				tmp.m_mat[i][j] = m_mat[i][j] - mat.m_mat[i][j];
-		return tmp;
+		if ((m_n == mat.m_n) && (m_m == mat.m_m))
+		{
+			std::cout << "operator-" << std::endl;
+			Matrix tmp(m_n, m_m);
+			for (int i = 0; i < m_n; i++)
+				for (int j = 0; j < m_m; j++)
+					tmp.m_mat[i][j] = m_mat[i][j] - mat.m_mat[i][j];
+			return tmp;
+		}
+		else
+			std::cout << "Некорректная матрица!"
 	}
 
 	// Оператор умножения !Не проверенный!
 	Matrix operator*(const Matrix& mat) 
 	{
-		std::cout << "operator*" << std::endl;
-		Matrix tmp(m_n, mat.m_m);
-		for (int i = 0; i < m_n; i++)
-			for (int j = 0; j < mat.m_m; j++)
-			{
-				tmp.m_mat[i][j] = 0;
-				for (int t = 0; t < mat.m_n; t++)
+		if (m_n == mat.m_m)
+		{
+			std::cout << "operator*" << std::endl;
+			Matrix tmp(m_n, mat.m_m);
+			for (int i = 0; i < m_n; i++)
+				for (int j = 0; j < mat.m_m; j++)
 				{
-					tmp.m_mat[i][j] += m_mat[i][t] * mat.m_mat[t][j];
+					tmp.m_mat[i][j] = 0;
+					for (int t = 0; t < mat.m_n; t++)
+					{
+						tmp.m_mat[i][j] += m_mat[i][t] * mat.m_mat[t][j];
+					}
 				}
-			}
-		return tmp;
+			return tmp;
+		}
+		else
+			std::cout<<"Некорректная матрица!"
 	}
 
 	//Метод для поиска определителя
@@ -149,9 +164,9 @@ public:
 	
 	Matrix Transp()
 	{
-		Matrix tmp(m_n, m_m);
-		for(int i = 0; i < m_n; i++)
-			for (int j = 0; j < m_m; j++)
+		Matrix tmp(m_m, m_n);
+		for(int i = 0; i < m_m; i++)
+			for (int j = 0; j < m_n; j++)
 			{
 				tmp.m_mat[i][j] = m_mat[j][i];
 			}
