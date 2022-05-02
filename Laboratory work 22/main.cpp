@@ -37,16 +37,21 @@ public:
 	// Присваивание
 	Matrix& operator=(const Matrix& mat)
 	{
-		std::cout << "Operator =" << std::endl;
+		if ((m_n == mat.m_n) && (m_m == mat.m_m))
+		{
+			std::cout << "Operator =" << std::endl;
 
-		m_n = mat.m_n;
-		m_m = mat.m_m;
+			m_n = mat.m_n;
+			m_m = mat.m_m;
 
-		for (int i = 0; i < m_n; i++)
-			for (int j = 0; j < m_m; j++)
-				m_mat[i][j] = mat.m_mat[i][j];
+			for (int i = 0; i < m_n; i++)
+				for (int j = 0; j < m_m; j++)
+					m_mat[i][j] = mat.m_mat[i][j];
 
-		return *this;
+			return *this;
+		}
+		else
+			std::cout << "Некорректная матрица!" << std::endl;
 	}
 
 	// Оператор сложения
@@ -62,10 +67,10 @@ public:
 			return tmp;
 		}
 		else
-			std::cout << "Некорректная матрица!"
+			std::cout << "Некорректная матрица!" << std::endl;
 	}
 
-	// Оператор вычитания !Не проверенный!
+	// Оператор вычитания
 	Matrix operator-(const Matrix& mat) 
 	{
 		if ((m_n == mat.m_n) && (m_m == mat.m_m))
@@ -78,13 +83,13 @@ public:
 			return tmp;
 		}
 		else
-			std::cout << "Некорректная матрица!"
+			std::cout << "Некорректная матрица!" << std::endl;
 	}
 
-	// Оператор умножения !Не проверенный!
+	// Оператор умножения
 	Matrix operator*(const Matrix& mat) 
 	{
-		if (m_n == mat.m_m)
+		if (m_m == mat.m_n)
 		{
 			std::cout << "operator*" << std::endl;
 			Matrix tmp(m_n, mat.m_m);
@@ -100,11 +105,11 @@ public:
 			return tmp;
 		}
 		else
-			std::cout<<"Некорректная матрица!"
+			std::cout << "Некорректная матрица!" << std::endl;
 	}
 
 	//Метод для поиска определителя
-	double Det()
+	int Det()
 	{
 		if (m_n != m_m)
 		{
@@ -113,18 +118,20 @@ public:
 
 		else if (m_n == m_m)
 		{
+
 			if (m_n == 2)
 			{
-				double d = 0;
-				d = (m_mat[0][0]*m_mat[1][1] - m_mat[0][1]*m_mat[1][0]);
+				int d = 0;
+				d = m_mat[0][0]*m_mat[1][1] - m_mat[0][1]*m_mat[1][0];
 				return d;
 			}
 			else if (m_n == 3)
 			{
-				double d = 0;
-				d = (m_mat[0][0] * m_mat[1][1] * m_mat[2][2] + m_mat[1][0] * m_mat[2][1] * m_mat[0][2] + m_mat[0][1] * m_mat[1][2] * m_mat[2][0] - m_mat[0][2] * m_mat[1][1] * m_mat[2][0] - m_mat[1][2] * m_mat[2][1] * m_mat[0][0] - m_mat[0][1] * m_mat[1][0] * m_mat[2][2]);
+				int d = 0;
+				d = m_mat[0][0] * m_mat[1][1] * m_mat[2][2] + m_mat[1][0] * m_mat[2][1] * m_mat[0][2] + m_mat[0][1] * m_mat[1][2] * m_mat[2][0] - m_mat[0][2] * m_mat[1][1] * m_mat[2][0] - m_mat[1][2] * m_mat[2][1] * m_mat[0][0] - m_mat[0][1] * m_mat[1][0] * m_mat[2][2];
 				return d;
 			}
+
 		}
 	}
 
@@ -217,28 +224,33 @@ std::ostream& operator<<(std::ostream& out, const Matrix& mat)
 
 int main()
 {
+	setlocale(LC_ALL, "rus");
 	
-	Matrix A(2, 2);
+	Matrix A(2, 3);
 
 	std::cin >> A;
 	//std::cout << A << std::endl; // std::cout << "Matrix " << mat.m_n << "x" << mat.m_m << mat.m_mat[0][0] << mat.m_mat[0][1] << ....
 
-	Matrix B(2, 2);
+	Matrix B(3, 1);
 	std::cin >> B;
 	//std::cout << B << std::endl;
 
-	Matrix C(2, 2);
+	Matrix C(2, 1);
 
-	/*C = A + B;
-	std::cout << C << std::endl; */
+	//C = A + B;
 
-	/*C = A - B;
-	std::cout << C << std::endl; */
+	//C = A - B;
 
 	C = A * B;
 	std::cout << C << std::endl;
-	std::cout << C.Det() << std::endl;
-	std::cout << C.Reverse() << std::endl;
+
+	//std::cout << "Det" << std::endl;
+	//std::cout << C.Det() << std::endl;
+
+	//std::cout << "Reverse" << std::endl;
+	//std::cout << C.Reverse() << std::endl;
+	
+	std::cout << "Transp" << std::endl;
 	std::cout << C.Transp() << std::endl;
 
 
