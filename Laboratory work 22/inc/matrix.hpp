@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 #include <iostream>
 
 namespace mt::math
@@ -15,7 +15,7 @@ namespace mt::math
 		T get(int i, int j) const { return m_mat[i][j]; }
 		void set(int i, int j, T data) { m_mat[i][j] = data; }
 
-		// Конструктор
+		// Constructor
 		Matrix()
 		{
 #ifdef DEBUG
@@ -35,8 +35,8 @@ namespace mt::math
 			std::cout << "Copy constructor" << std::endl;
 #endif
 
-			m_n = mat.m_n;
-			m_m = mat.m_m;
+			m_n = mat.getN();
+			m_m = mat.getM();
 
 			for (int i = 0; i < m_n; i++)
 				for (int j = 0; j < m_m; j++)
@@ -47,7 +47,7 @@ namespace mt::math
 		template<typename T, int N, int M>
 		Matrix<T, N, M>& operator=(const Matrix<T, N, M>& mat)
 		{
-			if ((m_n == mat.getN()) && (m_m == mat.getM())
+			if ((m_n == mat.getN()) && (m_m == mat.getM()))
 			{
 #ifdef DEBUG
 				std::cout << "Operator =" << std::endl;
@@ -58,7 +58,6 @@ namespace mt::math
 					for (int i = 0; i < m_n; i++)
 						for (int j = 0; j < m_m; j++)
 							m_mat[i][j] = mat.get(i, j);
-
 					return *this;
 			}
 			else
@@ -69,16 +68,16 @@ namespace mt::math
 		template<typename T, int N, int M>
 		Matrix<T, N, M> operator+(const Matrix<T, N, M>& mat)
 		{
-			if ((m_n == mat.getN()) && (m_m == mat.getM())
+			if ((m_n == mat.getN()) && (m_m == mat.getM()))
 			{
 #ifdef DEBUG
 				std::cout << "operator+" << std::endl;
 #endif
-				Matrix<T, N, M> tmp;
-				for (int i = 0; i < m_n; i++)
-					for (int j = 0; j < m_m; j++)
-						tmp.m_mat[i][j] = m_mat[i][j] + mat.get(i, j);
-				return tmp;
+					Matrix<T, N, M> tmp;
+					for (int i = 0; i < m_n; i++)
+						for (int j = 0; j < m_m; j++)
+							tmp.set(i, j, (m_mat[i][j] + mat.get(i, j)));
+					return tmp;
 			}
 			else
 				std::cout << "Incorrect matrix!" << std::endl;
@@ -88,16 +87,16 @@ namespace mt::math
 		template<typename T, int N, int M>
 		Matrix<T, N, M> operator-(const Matrix<T, N, M>& mat)
 		{
-			if ((m_n == mat.getN()) && (m_m == mat.getM())
+			if ((m_n == mat.getN()) && (m_m == mat.getM()))
 			{
 #ifdef DEBUG
 				std::cout << "operator-" << std::endl;
 #endif
-				Matrix<T, N, M> tmp;
-				for (int i = 0; i < m_n; i++)
-					for (int j = 0; j < m_m; j++)
-						tmp.m_mat[i][j] = m_mat[i][j] - mat.get(i, j);
-				return tmp;
+					Matrix<T, N, M> tmp;
+					for (int i = 0; i < m_n; i++)
+						for (int j = 0; j < m_m; j++)
+							tmp.set(i, j, (m_mat[i][j] - mat.get(i, j)));
+					return tmp;
 			}
 			else
 				std::cout << "Incorrect matrix!" << std::endl;
@@ -107,7 +106,7 @@ namespace mt::math
 		template<typename T, int N, int M>
 		Matrix<T, N, M> operator*(const Matrix<T, N, M>& mat)
 		{
-			if (m_m == mat.m_n)
+			if (m_m == mat.getN())
 			{
 #ifdef DEBUG
 				std::cout << "operator*" << std::endl;
@@ -116,11 +115,11 @@ namespace mt::math
 				for (int i = 0; i < m_n; i++)
 					for (int j = 0; j < mat.getM(); j++)
 					{
-						tmp.m_mat[i][j] = 0;
-						for (int t = 0; t < mat.getN(); t++)
-						{
-							tmp.m_mat[i][j] += m_mat[i][t] * mat.get(t, j);
-						}
+						T sum = 0;
+						for (int k = 0; k < m_m; k++)
+							sum += m_mat[i][k] * mat.get(k, j);
+						tmp.set(i, j, sum);
+
 					}
 				return tmp;
 			}
@@ -133,7 +132,7 @@ namespace mt::math
 		{
 			if (m_n != m_m)
 			{
-				std::cout << "Операция не поддерживается!" << std::endl;
+				std::cout << "Operation not available!" << std::endl;
 			}
 
 			else if (m_n == m_m)
@@ -157,32 +156,34 @@ namespace mt::math
 		Matrix<double, N, M> Reverse()
 		{
 			T det = Det();
-			Matrix<double, N, M> tmp;
+
 			if (det == 0)
 			{
-				std::cout << "Обратной матрицы не существует!" << std::endl;
+				std::cout << "Inverse matrix not exist!" << std::endl;
 			}
 			else if (m_n == m_m)
 			{
+				Matrix<double, N, M> tmp;
+
 				if (m_n == 2)
 				{
-					tmp.m_mat[0][0] = m_mat[1][1] / det;
-					tmp.m_mat[1][1] = m_mat[0][0] / det;
-					tmp.m_mat[1][0] = -(m_mat[1][0] / det);
-					tmp.m_mat[0][1] = -(m_mat[0][1] / det);
+					tmp.set(0, 0, m_mat[1][1] / det);
+					tmp.set(0, 1, -m_mat[0][1] / det);
+					tmp.set(1, 0, -m_mat[1][0] / det);
+					tmp.set(1, 1, m_mat[1][1] / det);
 					return tmp;
 				}
 				else if (m_n == 3)
 				{
-					tmp.m_mat[0][0] = (m_mat[1][1] * m_mat[2][2] - m_mat[2][1] * m_mat[1][2]) / det;
-					tmp.m_mat[1][0] = -(m_mat[1][0] * m_mat[2][2] - m_mat[2][0] * m_mat[1][2]) / det;
-					tmp.m_mat[2][0] = (m_mat[1][0] * m_mat[2][1] - m_mat[2][0] * m_mat[1][1]) / det;
-					tmp.m_mat[0][1] = -(m_mat[0][1] * m_mat[2][2] - m_mat[2][1] * m_mat[0][2]) / det;
-					tmp.m_mat[1][1] = (m_mat[0][0] * m_mat[2][2] - m_mat[2][0] * m_mat[0][2]) / det;
-					tmp.m_mat[2][1] = -(m_mat[0][0] * m_mat[2][1] - m_mat[2][0] * m_mat[0][1]) / det;
-					tmp.m_mat[0][2] = (m_mat[0][1] * m_mat[1][2] - m_mat[1][1] * m_mat[0][2]) / det;
-					tmp.m_mat[1][2] = -(m_mat[0][0] * m_mat[1][2] - m_mat[1][0] * m_mat[0][2]) / det;
-					tmp.m_mat[2][2] = (m_mat[0][0] * m_mat[1][1] - m_mat[1][0] * m_mat[0][1]) / det;
+					tmp.set(0, 0, ((m_mat[1][1] * m_mat[2][2] - m_mat[2][1] * m_mat[1][2]) / det));
+					tmp.set(1, 0, (-(m_mat[1][0] * m_mat[2][2] - m_mat[2][0] * m_mat[1][2]) / det));
+					tmp.set(2, 0, ((m_mat[1][0] * m_mat[2][1] - m_mat[2][0] * m_mat[1][1]) / det));
+					tmp.set(0, 1, (-(m_mat[0][1] * m_mat[2][2] - m_mat[2][1] * m_mat[0][2]) / det));
+					tmp.set(1, 1, ((m_mat[0][0] * m_mat[2][2] - m_mat[2][0] * m_mat[0][2]) / det));
+					tmp.set(2, 1, (-(m_mat[0][0] * m_mat[2][1] - m_mat[2][0] * m_mat[0][1]) / det));
+					tmp.set(0, 2, ((m_mat[0][1] * m_mat[1][2] - m_mat[1][1] * m_mat[0][2]) / det));
+					tmp.set(1, 2, (-(m_mat[0][0] * m_mat[1][2] - m_mat[1][0] * m_mat[0][2]) / det));
+					tmp.set(2, 2, ((m_mat[0][0] * m_mat[1][1] - m_mat[1][0] * m_mat[0][1]) / det));
 					return tmp;
 				}
 			}
@@ -191,16 +192,16 @@ namespace mt::math
 		//Transposition
 		Matrix<T, N, M> Transp()
 		{
-			Matrix<T, M, N> tmp;
-			for (int i = 0; i < m_m; i++)
-				for (int j = 0; j < m_n; j++)
+			Matrix<T, N, M> tmp;
+			for (int i = 0; i < M; i++)
+				for (int j = 0; j < N; j++)
 				{
-					tmp.m_mat[i][j] = m_mat[j][i];
+					tmp.set(i, j, m_mat[j][i]);
 				}
 			return tmp;
 		}
 
-		// Деструктор
+		// Destructor
 		~Matrix()
 		{
 #ifdef DEBUG
@@ -208,45 +209,44 @@ namespace mt::math
 #endif
 		}
 
-		// friend - позволяет функции иметь доступ к private полям/методам класса
+		
 		template<typename T, int N, int M>
 		friend std::istream& operator>>(std::istream& os, Matrix<T, N, M>& mat);
 		template<typename T, int N, int M>
 		friend std::ostream& operator<<(std::ostream& os, const Matrix<T, N, M>& mat);
 
-		// Использование внутри класса
+		
 	private:
-		int m_n, m_m;		// Поле
+		int m_n, m_m;		
 		T m_mat[N][M];
 	};
 
-	// Перегрузка оператора ввода
 	template<typename T, int N, int M>
 	std::istream& operator>>(std::istream& in, Matrix<T, N, M>& mat)
 	{
-		for (int i = 0; i < mat.getN(); i++)
-			for (int j = 0; j < mat.getM(); j++)
-				in >> mat.get(i, j);
+		for (int i = 0; i < mat.m_n; i++)
+			for (int j = 0; j < mat.m_m; j++)
+				in >> mat.m_mat[i][j];
 		return in;
+
 	}
 
-	// Перегрузка оператора вывода
 	template<typename T, int N, int M>
 	std::ostream& operator<<(std::ostream& out, const Matrix<T, N, M>& mat)
 	{
-		out << "Matrix " << mat.getN() << "x" << mat.getM() << std::endl;
-		for (int i = 0; i < mat.getN(); i++) 
-		{
-			for (int j = 0; j < mat.getM(); j++)
-				out << mat.get(i, j) << " ";
+		out << "Matrix " << mat.m_n << "x" << mat.m_m << std::endl;
+		for (int i = 0; i < mat.m_n; i++) {
+			for (int j = 0; j < mat.m_m; j++)
+				out << mat.m_mat[i][j] << " ";
 			out << std::endl;
 		}
 		return out;
 	}
 
-	using Vec2i = Matrix<int, 2, 1>;
-	using Vec3i = Matrix<int, 3, 1>;
+	using Vec21i = Matrix<int, 2, 1>;
+	using Vec31i = Matrix<int, 3, 1>;
 	using Mat22i = Matrix<int, 2, 2>;
 	using Mat23i = Matrix<int, 2, 3>;
+	using Vec12i = Matrix<int, 1, 2>;
 
 }

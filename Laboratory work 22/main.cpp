@@ -1,19 +1,23 @@
 #include <iostream>
 #include "inc/matrix.hpp"
 
-using mt::math::Vec2i;
-using mt::math::Vec3i;
+using mt::math::Mat22i;
+using mt::math::Vec21i;
+using mt::math::Vec31i;
 using mt::math::Mat23i;
 
 int main()
 {
-	Mat23i A;
+
+	Mat22i A;
+	std::cout << "Enter A" << std::endl;
 	std::cin >> A;
 
-	Vec3i B;
+	Vec21i B;
+	std::cout << "Enter B" << std::endl;
 	std::cin >> B;
 
-	Vec2i C;
+	Vec21i C;
 
 	std::cout << "----------------Test addition-------------------" << std::endl;
 	{
@@ -31,12 +35,12 @@ int main()
 	std::cout << "--------------------Test substraction done!-----------------------" << std::endl;
 
 
-	std::cout << "----------------Test substraction-------------------" << std::endl;
+	std::cout << "----------------Test multiplication-------------------" << std::endl;
 	{
 		C = A * B;
 		std::cout << C << std::endl;
 	}
-	std::cout << "--------------------Test substraction done!-----------------------" << std::endl;
+	std::cout << "--------------------Test multiplication done!-----------------------" << std::endl;
 
 
 	std::cout << "----------------Test Determinant-------------------" << std::endl;
