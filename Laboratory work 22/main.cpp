@@ -48,7 +48,7 @@ public:
 			return *this;
 		}
 		else
-			std::cout << "Некорректная матрица!" << std::endl;
+			std::cout << "Incorrect matrix!" << std::endl;
 	}
 
 	// Addition operator
@@ -64,7 +64,7 @@ public:
 			return tmp;
 		}
 		else
-			std::cout << "Некорректная матрица!" << std::endl;
+			std::cout << "Incorrect matrix!" << std::endl;
 	}
 
 	// Subtraction operator
@@ -80,7 +80,7 @@ public:
 			return tmp;
 		}
 		else
-			std::cout << "Некорректная матрица!" << std::endl;
+			std::cout << "Incorrect matrix!" << std::endl;
 	}
 
 	// Multiplication operator
@@ -102,7 +102,7 @@ public:
 			return tmp;
 		}
 		else
-			std::cout << "Некорректная матрица!" << std::endl;
+			std::cout << "Incorrect matrix!" << std::endl;
 	}
 
 	//Determinant
@@ -110,7 +110,7 @@ public:
 	{
 		if (m_n != m_m)
 		{
-			std::cout << "Операция не поддерживается!" << std::endl;
+			std::cout << "Operation not available!" << std::endl;
 		}
 
 		else if (m_n == m_m)
@@ -139,7 +139,7 @@ public:
 		Matrix tmp(m_n, m_m);
 		if (det == 0)
 		{
-			std::cout << "Обратной матрицы не существует!" << std::endl;
+			std::cout << "Inverse matrix not exist!" << std::endl;
 		}
 		else if (m_n == m_m)
 		{
@@ -218,8 +218,6 @@ std::ostream& operator<<(std::ostream& out, const Matrix& mat)
 
 int main()
 {
-	setlocale(LC_ALL, "rus");
-	
 	Matrix A(2, 3);
 
 	std::cin >> A;
