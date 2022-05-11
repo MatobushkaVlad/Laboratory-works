@@ -190,9 +190,9 @@ namespace mt::math
 		}
 
 		//Transposition
-		Matrix<T, N, M> Transp()
+		Matrix<T, M, N> Transp()
 		{
-			Matrix<T, N, M> tmp;
+			Matrix<T, M, N> tmp;
 			for (int i = 0; i < M; i++)
 				for (int j = 0; j < N; j++)
 				{
