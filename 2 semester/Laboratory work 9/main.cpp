@@ -2,128 +2,69 @@
 #include <fstream>
 #include "inc/bmp.hpp"
 
-#pragma pack(1) //disable compiler memory aligment (Отключение выравнивания памяти компилятором)
-struct BMPHEADER  //14 byte structure
-{
-	unsigned short Type;
-	unsigned int Size;
-	unsigned short Reversed1;
-	unsigned short Reversed2;
-	unsigned int OffBits;
-};
-#pragma pack()
-
-#pragma pack(1)
-struct BMPINFO //40 byte structure
-{
-	unsigned int    Size;
-	int             Width;
-	int             Height;
-	unsigned short  Planes;
-	unsigned short  BitCount;
-	unsigned int    Compression;
-	unsigned int    SizeImage;
-	int             XPelsPerMeter;
-	int             YPelsPerMeter;
-	unsigned int    ClrUsed;
-	unsigned int    ClrImportant;
-};
-#pragma pack()
-
-struct Pixel
-{
-	unsigned char b;
-	unsigned char g;
-	unsigned char r;
-};
-
-
 int main()
 {
-	//READING FILE
-	std::ifstream in("in.bmp", std::ios::binary); //open file for binary reading (открытие файла для бинарного чтения)
+	int choose = 0;
+	std::cout << "Choose filter to use: " << std::endl;
+	std::cout << "1) User's filter " << std::endl;
+	std::cout << "2) Blue filter " << std::endl;
+	std::cout << "3) Green filter " << std::endl;
+	std::cout << "4) Red filter" << std::endl;
 
-	BMPHEADER bmpheader;
-	//Read 14 bytes byte by byte and fill BMPHEADER srtucture (Считать 14 байтов побайтово и заполнить структуру BMPHEADER)
-	//reinterpret_cast<char*>(&bmpheader) (представляет/интерпритирует структуру в виде элемента char размером 14 байт)
-	in.read(reinterpret_cast<char*>(&bmpheader), sizeof(BMPHEADER));
+	std::cin >> choose;
 
-	BMPINFO bmpinfo;
-	in.read(reinterpret_cast<char*>(&bmpinfo), sizeof(BMPINFO));
-
-	Pixel* *pixels = new Pixel* [bmpinfo.Height];
-	for (int i = 0; i < bmpinfo.Height; i++)
-		pixels[i] = new Pixel [bmpinfo.Width];
-	for (int i = 0; i < bmpinfo.Height; i++)
+	if (choose == 1)
 	{
-		for (int j = 0; j < bmpinfo.Width; j++)
-			in.read(reinterpret_cast<char*>(&pixels[i][j]), sizeof(Pixel));
-		if ((3 * bmpinfo.Width) % 4 != 0)
-		{
-			for (int j = 0; j < 4 - (3 * bmpinfo.Width) % 4; j++)
-			{
-				char c;
-				in.read(&c, 1);
-			}
-		}
-	}
+		int blue = 0;
+		int green = 0;
+		int red = 0;
 
-	//Change color
-	for (int i = 0; i < bmpinfo.Height; i++)
+		image::BMP bmp;
+
+		std::cout << "--------Enter color change value-------" << std::endl;
+
+		std::cout << "Blue: "; std::cin >> blue;
+		std::cout << "Green: "; std::cin >> green;
+		std::cout << "Red: "; std::cin >> red;
+
+		std::cout << "----------------------------------------" << std::endl;
+
+		bmp.Read("in.bmp");
+
+		bmp.Filter(blue, green, red);
+
+		bmp.Write("out.bmp");
+	}
+	else if (choose == 2)
 	{
-		for (int j = 0; j < bmpinfo.Width; j++)
-			pixels[i][j].b += 100;
+		image::BMP bmp;
+
+		bmp.Read("in.bmp");
+
+		bmp.BlueFilter();
+
+		bmp.Write("out.bmp");
 	}
-
-	//WRITING FILE
-	std::ofstream out("out.bmp", std::ios::binary);
-
-	BMPHEADER bmpheader_new;
-	bmpheader_new.Type = bmpheader.Type;
-	bmpheader_new.Size = 14 + 40 + 3 * (bmpinfo.Height * bmpinfo.Width);
-	if (bmpinfo.Width % 4 != 0)
-		bmpheader_new.Size += (4 - (3 * bmpinfo.Width) % 4) * bmpinfo.Height;
-	bmpheader_new.OffBits = bmpheader.OffBits;
-	bmpheader_new.Reversed1 = bmpheader.Reversed1;
-	bmpheader_new.Reversed2 = bmpheader.Reversed2;
-
-	out.write(reinterpret_cast<char*>(&bmpheader_new), sizeof(BMPHEADER));
-
-	BMPINFO bmpinfo_new;
-	bmpinfo_new.Size = bmpinfo.Size;
-	bmpinfo_new.Width = bmpinfo.Width;
-	bmpinfo_new.Height = bmpinfo.Height;
-	bmpinfo_new.Planes = bmpinfo.Planes;
-	bmpinfo_new.BitCount = bmpinfo.BitCount;
-	bmpinfo_new.Compression = bmpinfo.Compression;
-	bmpinfo_new.SizeImage = bmpinfo.SizeImage;
-	bmpinfo_new.XPelsPerMeter = bmpinfo.XPelsPerMeter;
-	bmpinfo_new.YPelsPerMeter = bmpinfo.YPelsPerMeter;
-	bmpinfo_new.ClrUsed = bmpinfo.ClrUsed;
-	bmpinfo_new.ClrImportant = bmpinfo.ClrImportant;
-
-	out.write(reinterpret_cast<char*>(&bmpinfo_new), sizeof(BMPINFO));
-	
-	for (int i = 0; i < bmpinfo_new.Height; i++)
+	else if (choose == 3)
 	{
-		for (int j = 0; j < bmpinfo_new.Width; j++)
-			out.write(reinterpret_cast<char*>(&pixels[i][j]), sizeof(Pixel));
-		if ((3 * bmpinfo_new.Width) % 4 != 0)
-		{
-			for (int j = 0; j < 4 - (3 * bmpinfo_new.Width) % 4; j++)
-			{
-				char c;
-				out.write(&c, 1);
-			}
-		}
+		image::BMP bmp;
+
+		bmp.Read("in.bmp");
+
+		bmp.GreenFilter();
+
+		bmp.Write("out.bmp");
 	}
+	else
+	{
+		image::BMP bmp;
 
+		bmp.Read("in.bmp");
 
-	for (int i = 0; i < bmpinfo.Height; i++)
-		delete[] pixels[i];
-	delete[] pixels;
+		bmp.RedFilter();
 
-
+		bmp.Write("out.bmp");
+	}
 
 	return 0;
 }
