@@ -4,6 +4,10 @@
 
 int main()
 {
+	image::BMP bmp;
+
+	bmp.Read("in.bmp");
+
 	int choose = 0;
 	std::cout << "Choose filter to use: " << std::endl;
 	std::cout << "1) User's filter " << std::endl;
@@ -13,58 +17,22 @@ int main()
 
 	std::cin >> choose;
 
-	if (choose == 1)
+	switch (choose)
 	{
-		int blue = 0;
-		int green = 0;
-		int red = 0;
+	case 1:
+		bmp.Filter();
 
-		image::BMP bmp;
-
-		std::cout << "--------Enter color change value-------" << std::endl;
-
-		std::cout << "Blue: "; std::cin >> blue;
-		std::cout << "Green: "; std::cin >> green;
-		std::cout << "Red: "; std::cin >> red;
-
-		std::cout << "----------------------------------------" << std::endl;
-
-		bmp.Read("in.bmp");
-
-		bmp.Filter(blue, green, red);
-
-		bmp.Write("out.bmp");
-	}
-	else if (choose == 2)
-	{
-		image::BMP bmp;
-
-		bmp.Read("in.bmp");
-
+	case 2:
 		bmp.BlueFilter();
 
-		bmp.Write("out.bmp");
-	}
-	else if (choose == 3)
-	{
-		image::BMP bmp;
-
-		bmp.Read("in.bmp");
-
+	case 3:
 		bmp.GreenFilter();
 
-		bmp.Write("out.bmp");
-	}
-	else
-	{
-		image::BMP bmp;
-
-		bmp.Read("in.bmp");
-
+	case 4:
 		bmp.RedFilter();
-
-		bmp.Write("out.bmp");
 	}
+
+	bmp.Write("out.bmp");
 
 	return 0;
 }
