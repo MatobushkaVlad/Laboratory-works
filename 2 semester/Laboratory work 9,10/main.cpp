@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include "matrix.hpp"
 #include "inc/bmp.hpp"
 
 int main()

@@ -1,5 +1,9 @@
 #include "bmp.hpp"
+#include "matrix.hpp"
 #include <iostream>
+
+using mt::math::Vec21d;
+using mt::math::Mat22d;
 
 namespace image
 {
@@ -25,9 +29,21 @@ namespace image
 		m_height = bmpinfo.Height;
 		m_width = bmpinfo.Width;
 
+		//massive for pixels
 		m_pixels = new Pixel * [m_height];
 		for (int i = 0; i < m_height; i++)
 			m_pixels[i] = new Pixel[m_width];
+
+		//massive for coordinates
+		m_coordinates = new Vec21d * [m_height];
+		for (int i = 0; i < m_height; i++)
+			m_coordinates[i] = new Vec21d[m_width];
+		for(int i = 0 ; i < m_height; i++)
+			for (int j = 0; j < m_width; j++)
+			{
+				m_coordinates[i][j].set(0, 0, j);
+				m_coordinates[i][j].set(1, 0, i);
+			}
 
 		for (int i = 0; i < m_height; i++)
 		{
@@ -153,10 +169,39 @@ namespace image
 		}
 	}
 
+	void BMP::Rotate(double angle)
+	{
+		//1 Смещение центра координат
+
+		Vec21d T;
+		T.set(0, 0, m_height / 2); 
+		T.set(1, 0, m_width / 2);
+
+		//Вычитание из координат смещения 
+		for (int i = 0; i < m_height; i++)
+			for (int j = 0; j < m_width; j++)
+				m_coordinates[i][j] = m_coordinates[i][j] - T;
+
+		//2 Поворот
+
+		Mat22d R;
+		R.set(0, 0, cos(angle)); R.set(0, 1, sin(angle));
+		R.set(1, 0, -sin(angle)); R.set(1, 1, cos(angle));
+
+		//New coor-s after rotate
+		for (int i = 0; i < m_height; i++)
+			for (int j = 0; j < m_width; j++)
+				m_coordinates[i][j] = R * m_coordinates[i][j];
+	}
+
 	BMP::~BMP()
 	{
 		for (int i = 0; i < m_height; i++)
 			delete[] m_pixels[i];
 		delete[] m_pixels;
+
+		for (int i = 0; i < m_height; i++)
+			delete[] m_coordinates[i];
+		delete[] m_coordinates;
 	}
 }

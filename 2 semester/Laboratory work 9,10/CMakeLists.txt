@@ -13,6 +13,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 include_directories(inc/
 		    src/)
 
-add_executable(${PROJECT_NAME} main.cpp inc/bmp.hpp src/bmp.cpp)
+add_executable(${PROJECT_NAME} main.cpp inc/bmp.hpp 
+                                        inc/matrix.hpp
+					src/bmp.cpp)
 
 file(COPY "in.bmp" DESTINATION "/")

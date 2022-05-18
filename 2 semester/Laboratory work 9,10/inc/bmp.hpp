@@ -2,6 +2,8 @@
 #include <iostream>
 #include <fstream>
 
+using mt::math::Vec21d;
+
 namespace image
 {
 	class BMP
@@ -30,6 +32,8 @@ namespace image
 
 		void RedFilter();
 
+		void Rotate(double angle);
+
 		~BMP();
 		
 	private:
@@ -38,6 +42,7 @@ namespace image
 		int m_width = 0;
 		//двойной динамический массив из жлементов типа Pixel
 		Pixel** m_pixels = nullptr;
+		Vec21d** m_coordinates = nullptr;
 
 #pragma pack(1) //disable compiler memory aligment (Отключение выравнивания памяти компилятором)
 		struct BMPHEADER  //14 byte structure
