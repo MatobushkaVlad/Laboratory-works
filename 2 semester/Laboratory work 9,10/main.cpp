@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include "matrix.hpp"
 #include "inc/bmp.hpp"
 
 int main()
@@ -15,6 +14,7 @@ int main()
 	std::cout << "2) Blue filter " << std::endl;
 	std::cout << "3) Green filter " << std::endl;
 	std::cout << "4) Red filter" << std::endl;
+	std::cout << "5) Rotate" << std::endl;
 
 	std::cin >> choose;
 
@@ -31,6 +31,9 @@ int main()
 
 	case 4:
 		bmp.RedFilter();
+
+	case 5:
+		bmp.Rotate(acos(-1) / 4);
 	}
 
 	bmp.Write("out.bmp");

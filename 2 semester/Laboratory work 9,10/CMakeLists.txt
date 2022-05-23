@@ -14,7 +14,7 @@ include_directories(inc/
 		    src/)
 
 add_executable(${PROJECT_NAME} main.cpp inc/bmp.hpp 
-                                        inc/matrix.hpp
+                                        inc/mathutils/matrix.hpp
 					src/bmp.cpp)
 
 file(COPY "in.bmp" DESTINATION "/")

@@ -1,5 +1,4 @@
 #include "bmp.hpp"
-#include "matrix.hpp"
 #include <iostream>
 
 using mt::math::Vec21d;
@@ -9,6 +8,8 @@ namespace image
 {
 	BMP::BMP()
 	{
+		m_width = 0;
+		m_height = 0;
 
 	}
 
@@ -174,10 +175,10 @@ namespace image
 		//1 —мещение центра координат
 
 		Vec21d T;
-		T.set(0, 0, m_height / 2); 
+		T.set(0, 0, m_height / 2);
 		T.set(1, 0, m_width / 2);
 
-		//¬ычитание из координат смещени€ 
+		//¬ычитание из координат смещени€
 		for (int i = 0; i < m_height; i++)
 			for (int j = 0; j < m_width; j++)
 				m_coordinates[i][j] = m_coordinates[i][j] - T;
@@ -192,6 +193,94 @@ namespace image
 		for (int i = 0; i < m_height; i++)
 			for (int j = 0; j < m_width; j++)
 				m_coordinates[i][j] = R * m_coordinates[i][j];
+
+		//3 ѕеренос цветов в новый массив пикселей
+
+		//Ќаходим минимальные и максимальные координаты нового изображени€
+		int Xmax = INT_MIN;
+		int Xmin = INT_MAX;
+		int Ymax = INT_MIN;
+		int Ymin = INT_MAX;
+
+		for (int i = 0; i < m_height; i++)
+			for (int j = 0; j < m_width; j++)
+			{
+				if (Xmax < m_coordinates[i][j].get(0, 0))
+					Xmax = m_coordinates[i][j].get(0, 0);
+				if (Xmin > m_coordinates[i][j].get(0, 0))
+					Xmax = m_coordinates[i][j].get(0, 0);
+				if (Ymax < m_coordinates[i][j].get(1, 0))
+					Ymax = m_coordinates[i][j].get(1, 0);
+				if (Ymin > m_coordinates[i][j].get(1, 0))
+					Ymin = m_coordinates[i][j].get(1, 0);
+			}
+
+		//прибавл€ем +1 в избежание ошибок из-за округлени€, что позволит не выйти за пределы массива
+		Xmax++;
+		Xmin++;
+		Ymax++;
+		Ymin++;
+
+		//ѕереход к новой " анонической" сис-ме коор-т
+		int height = (Xmax - Xmin);
+		int width = (Ymax - Ymin);
+
+		Vec21d Shift;
+		Shift.set(0, 0, width / 2);
+		Shift.set(1, 0, height / 2);
+
+		for (int i = 0; i < m_height; i++)
+			for (int j = 0; j < m_width; j++)
+				m_coordinates[i][j] = m_coordinates[i][j] + Shift;
+
+		//—оздание нового массива пикселей дл€ нового(повернутого) изображени€
+		Pixel** new_pixels = new Pixel * [height];
+		for (int i = 0; i < height; i++)
+			new_pixels[i] = new Pixel[width];
+
+		for (int i = 0; i < height; i++)
+			for (int j = 0; j < width; j++)
+				new_pixels[i][j] = { 255,255,255 };
+
+		//
+		Vec21d** new_coordinates = new Vec21d * [height];
+		for (int i = 0; i < height; i++)
+			new_coordinates[i] = new Vec21d[width];
+
+		for (int i = 0; i < height; i++)
+			for (int j = 0; j < width; j++) 
+			{
+				new_coordinates[i][j].set(0, 0, j);
+				new_coordinates[i][j].set(0, 0, i);
+			}
+
+
+		// опирование цвета из старого массива в новый
+		for(int i = 0; i < m_height;i++)
+			for (int j = 0; j < m_width; j++)
+			{
+				int x = m_coordinates[i][j].get(0, 0);
+				int y = m_coordinates[i][j].get(1,0);
+				new_pixels[y][x] = m_pixels[i][j];
+			}
+
+		//”даление старого массива пикселей
+		for (int i = 0; i < m_height; i++)
+			delete[] m_pixels[i];
+		delete[] m_pixels;
+
+
+		for (int i = 0; i < m_height; i++)
+			delete[] m_coordinates[i];
+		delete[] m_coordinates;
+
+		//ƒелаем новые значени€ основными дл€ изображени€
+		m_pixels = new_pixels;
+		m_coordinates = new_coordinates;
+
+		m_height = height;
+		m_width = width;
+
 	}
 
 	BMP::~BMP()
