@@ -175,8 +175,8 @@ namespace image
 		//1 Смещение центра координат
 
 		Vec21d T;
-		T.set(0, 0, m_height / 2);
-		T.set(1, 0, m_width / 2);
+		T.set(0, 0, (double)m_height / 2);
+		T.set(1, 0, (double)m_width / 2);
 
 		//Вычитание из координат смещения
 		for (int i = 0; i < m_height; i++)
@@ -226,8 +226,8 @@ namespace image
 		int width = (Ymax - Ymin);
 
 		Vec21d Shift;
-		Shift.set(0, 0, width / 2);
-		Shift.set(1, 0, height / 2);
+		Shift.set(0, 0, (double)width / 2);
+		Shift.set(1, 0, (double)height / 2);
 
 		for (int i = 0; i < m_height; i++)
 			for (int j = 0; j < m_width; j++)
@@ -259,8 +259,8 @@ namespace image
 		for(int i = 0; i < m_height;i++)
 			for (int j = 0; j < m_width; j++)
 			{
-				int x = m_coordinates[i][j].get(0, 0);
-				int y = m_coordinates[i][j].get(1,0);
+				int x = (int)m_coordinates[i][j].get(0, 0);
+				int y = (int)m_coordinates[i][j].get(1,0);
 				new_pixels[y][x] = m_pixels[i][j];
 			}
 
