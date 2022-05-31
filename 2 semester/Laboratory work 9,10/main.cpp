@@ -8,6 +8,10 @@ int main()
 
 	bmp.Read("in.bmp");
 
+	bmp.Rotate(acos( 1 / 4));
+
+	bmp.Fix();
+	/*
 	int choose = 0;
 	std::cout << "Choose filter to use: " << std::endl;
 	std::cout << "1) User's filter " << std::endl;
@@ -34,8 +38,7 @@ int main()
 
 	case 5:
 		bmp.Rotate(acos(-1) / 4);
-	}
-
+	} */
 	bmp.Write("out.bmp");
 
 	return 0;

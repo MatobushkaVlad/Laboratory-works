@@ -13,97 +13,167 @@ namespace image
 
 	}
 
-	void BMP::Read(const std::string& filename)
+	BMP::BMP(int width, int height)
 	{
-		std::ifstream in(filename, std::ios::binary);
+		m_width = width;
+		m_height = height;
 
-		BMPHEADER bmpheader;
-
-		//Read 14 bytes byte by byte and fill BMPHEADER srtucture (Считать 14 байтов побайтово и заполнить структуру BMPHEADER)
-		//reinterpret_cast<char*>(&bmpheader) (представляет/интерпритирует структуру в виде элемента char размером 14 байт)
-		in.read(reinterpret_cast<char*>(&bmpheader), sizeof(BMPHEADER));
-
-		BMPINFO bmpinfo;
-
-		in.read(reinterpret_cast<char*>(&bmpinfo), sizeof(BMPINFO));
-
-		m_height = bmpinfo.Height;
-		m_width = bmpinfo.Width;
-
-		//massive for pixels
 		m_pixels = new Pixel * [m_height];
 		for (int i = 0; i < m_height; i++)
 			m_pixels[i] = new Pixel[m_width];
 
-		//massive for coordinates
 		m_coordinates = new Vec21d * [m_height];
 		for (int i = 0; i < m_height; i++)
 			m_coordinates[i] = new Vec21d[m_width];
-		for(int i = 0 ; i < m_height; i++)
+
+		for (int i = 0; i < m_height; i++)
+			for (int j = 0; j < m_width; j++)
+				m_pixels[i][j] = { 255, 0, 0 };
+
+		for (int i = 0; i < m_height; i++)
+		{
 			for (int j = 0; j < m_width; j++)
 			{
 				m_coordinates[i][j].set(0, 0, j);
 				m_coordinates[i][j].set(1, 0, i);
 			}
+		}
+	}
+
+	BMP::BMP(const BMP& bmp)
+	{
+		if (m_pixels != nullptr)
+		{
+			for (int i = 0; i < m_height; i++)
+				delete[] m_pixels[i];
+			delete[] m_pixels;
+		}
+
+		m_width = bmp.m_width;
+		m_height = bmp.m_height;
+
+		m_pixels = new Pixel * [m_height];
+		for (int i = 0; i < m_height; i++)
+			m_pixels[i] = new Pixel[m_width];
+
+		m_coordinates = new Vec21d * [m_height];
+		for (int i = 0; i < m_height; i++)
+			m_coordinates[i] = new Vec21d[m_width];
 
 		for (int i = 0; i < m_height; i++)
-		{
 			for (int j = 0; j < m_width; j++)
+				m_pixels[i][j] = bmp.m_pixels[i][j];
+
+		for (int i = 0; i < m_height; i++)
+			for (int j = 0; j < m_width; j++)
+				m_coordinates[i][j] = bmp.m_coordinates[i][j];
+	}
+
+	BMP::~BMP()
+	{
+		for (int i = 0; i < m_height; i++)
+			delete[] m_pixels[i];
+		delete[] m_pixels;
+
+		for (int i = 0; i < m_height; i++)
+			delete[] m_coordinates[i];
+		delete[] m_coordinates;
+	}
+
+	void BMP::Read(const std::string& filename)
+	{
+		// Read file
+		std::ifstream in(filename, std::ios::binary); // open file for binary reading
+
+		BMPHEADER bmpHeader;
+		in.read(reinterpret_cast<char*>(&bmpHeader), sizeof(BMPHEADER));
+
+		BMPINFO bmpInfo;
+		in.read(reinterpret_cast<char*>(&bmpInfo), sizeof(BMPINFO));
+
+		if (m_pixels != nullptr)
+		{
+			for (int i = 0; i < m_height; i++)
+				delete[] m_pixels[i];
+			delete[] m_pixels;
+		}
+
+		m_height = bmpInfo.Height;
+		m_width = bmpInfo.Width;
+
+		m_pixels = new Pixel * [bmpInfo.Height];
+		for (int i = 0; i < bmpInfo.Height; i++)
+			m_pixels[i] = new Pixel[bmpInfo.Width];
+
+		m_coordinates = new Vec21d * [m_height];
+		for (int i = 0; i < m_height; i++)
+			m_coordinates[i] = new Vec21d[m_width];
+
+		for (int i = 0; i < bmpInfo.Height; i++)
+		{
+			for (int j = 0; j < bmpInfo.Width; j++)
 				in.read(reinterpret_cast<char*>(&m_pixels[i][j]), sizeof(Pixel));
-			if ((3 * m_width) % 4 != 0)
-			{
-				for (int j = 0; j < 4 - (3 * m_width) % 4; j++)
+
+			if ((3 * bmpInfo.Width) % 4 != 0)
+				for (int j = 0; j < 4 - (3 * bmpInfo.Width) % 4; j++)
 				{
-					char c;
+					char c = 0;
 					in.read(&c, 1);
 				}
-			}
 		}
+		for (int i = 0; i < m_height; i++)
+			for (int j = 0; j < m_width; j++)
+			{
+				m_coordinates[i][j].set(0, 0, j);
+				m_coordinates[i][j].set(1, 0, i);
+			}
 	}
 
 	void BMP::Write(const std::string& filename)
 	{
+		// Save file
 		std::ofstream out(filename, std::ios::binary);
 
-		BMPHEADER bmpheader_new;
-
-		bmpheader_new.Type = 0x4D42;
-		bmpheader_new.Size = 14 + 40 + 3 * (m_height * m_width);
+		// Heading formation
+		BMPHEADER bmpHeader_new;
+		bmpHeader_new.Type = 0x4D42;
+		bmpHeader_new.Size = 14 + 40 + (3 * m_width * m_height);
 		if (m_width % 4 != 0)
-			bmpheader_new.Size += (4 - (3 * m_width) % 4) * m_height;
-		bmpheader_new.OffBits = 54;
-		bmpheader_new.Reversed1 = 0;
-		bmpheader_new.Reversed2 = 0;
+			bmpHeader_new.Size += (4 - (3 * m_width) % 4) * m_height;
+		bmpHeader_new.OffBits = 54;
+		bmpHeader_new.Reversed1 = 0;
+		bmpHeader_new.Reversed2 = 0;
 
-		out.write(reinterpret_cast<char*>(&bmpheader_new), sizeof(BMPHEADER));
+		out.write(reinterpret_cast<char*>(&bmpHeader_new), sizeof(BMPHEADER));
 
-		BMPINFO bmpinfo_new;
-		bmpinfo_new.BitCount = 24;
-		bmpinfo_new.ClrImportant = 0;
-		bmpinfo_new.ClrUsed = 0;
-		bmpinfo_new.Compression = 0;
-		bmpinfo_new.Height = m_height;
-		bmpinfo_new.Planes = 1;
-		bmpinfo_new.Size = 40;
-		bmpinfo_new.SizeImage = bmpheader_new.Size - 54;
-		bmpinfo_new.Width = m_width;
-		bmpinfo_new.XPelsPerMeter = 0;
-		bmpinfo_new.YPelsPerMeter = 0;
+		// Formation of image information
+		BMPINFO bmpInfo_new;
+		bmpInfo_new.BitCount = 24;
+		bmpInfo_new.ClrImportant = 0;
+		bmpInfo_new.ClrUsed = 0;
+		bmpInfo_new.Compression = 0;
+		bmpInfo_new.Height = m_height;
+		bmpInfo_new.Planes = 1;
+		bmpInfo_new.Size = 40;
+		bmpInfo_new.SizeImage = bmpHeader_new.Size - 54;
+		bmpInfo_new.Width = m_width;
+		bmpInfo_new.XPelsPerMeter = 0;
+		bmpInfo_new.YPelsPerMeter = 0;
 
-		out.write(reinterpret_cast<char*>(&bmpinfo_new), sizeof(BMPINFO));
+		out.write(reinterpret_cast<char*>(&bmpInfo_new), sizeof(BMPINFO));
 
-		for (int i = 0; i < m_height; i++)
+		// read pixels
+		for (int i = 0; i < bmpInfo_new.Height; i++)
 		{
-			for (int j = 0; j < m_width; j++)
+			for (int j = 0; j < bmpInfo_new.Width; j++)
 				out.write(reinterpret_cast<char*>(&m_pixels[i][j]), sizeof(Pixel));
-			if ((3 * bmpinfo_new.Width) % 4 != 0)
-			{
-				for (int j = 0; j < 4 - (3 * m_width) % 4; j++)
+
+			if ((3 * bmpInfo_new.Width) % 4 != 0)
+				for (int j = 0; j < 4 - (3 * bmpInfo_new.Width) % 4; j++)
 				{
-					char c;
+					char c = 0;
 					out.write(&c, 1);
 				}
-			}
 		}
 	}
 
@@ -174,9 +244,10 @@ namespace image
 	{
 		//1 Смещение центра координат
 
-		Vec21d T;
-		T.set(0, 0, (double)m_height / 2);
-		T.set(1, 0, (double)m_width / 2);
+		Vec21d T({ {
+			 {(double)(m_width / 2)},
+			 {(double)(m_height / 2)}
+		 } });
 
 		//Вычитание из координат смещения
 		for (int i = 0; i < m_height; i++)
@@ -185,9 +256,10 @@ namespace image
 
 		//2 Поворот
 
-		Mat22d R;
-		R.set(0, 0, cos(angle)); R.set(0, 1, sin(angle));
-		R.set(1, 0, -sin(angle)); R.set(1, 1, cos(angle));
+		Mat22d R({ {
+				{cos(angle), sin(angle)},
+				{-sin(angle), cos(angle)}
+			} });
 
 		//New coor-s after rotate
 		for (int i = 0; i < m_height; i++)
@@ -225,9 +297,10 @@ namespace image
 		int height = (Xmax - Xmin);
 		int width = (Ymax - Ymin);
 
-		Vec21d Shift;
-		Shift.set(0, 0, (double)width / 2);
-		Shift.set(1, 0, (double)height / 2);
+		Vec21d Shift({ {
+				{(double)(width / 2)},
+				{(double)(height / 2)}
+			} });
 
 		for (int i = 0; i < m_height; i++)
 			for (int j = 0; j < m_width; j++)
@@ -240,7 +313,7 @@ namespace image
 
 		for (int i = 0; i < height; i++)
 			for (int j = 0; j < width; j++)
-				new_pixels[i][j] = { 255,255,255 };
+				new_pixels[i][j] = { 0,0,0 };
 
 		//
 		Vec21d** new_coordinates = new Vec21d * [height];
@@ -283,14 +356,89 @@ namespace image
 
 	}
 
-	BMP::~BMP()
+	bool BMP::ItsBlack(int x, int y)
 	{
-		for (int i = 0; i < m_height; i++)
-			delete[] m_pixels[i];
-		delete[] m_pixels;
-
-		for (int i = 0; i < m_height; i++)
-			delete[] m_coordinates[i];
-		delete[] m_coordinates;
+		if ((m_pixels[x][y].r == 0) && (m_pixels[x][y].g == 0) && (m_pixels[x][y].b == 0))
+		{
+			return true;
+		}
+		return false;
 	}
+
+	void BMP::Fix()
+	{
+		for (int i = 0; i < m_height - 1; i++)
+			for (int j = 0; j < m_width - 1; j++)
+			{
+				int summ_r = 0;
+				int summ_g = 0;
+				int summ_b = 0;
+				int kol = 0;
+
+				if (ItsBlack(i, j))
+				{
+					if ((i - 1 >= 0) && (j - 1 >= 0))
+					{
+						summ_r += (int)m_pixels[i - 1][j - 1].r;
+						summ_g += (int)m_pixels[i - 1][j - 1].g;
+						summ_b += (int)m_pixels[i - 1][j - 1].b;
+						kol += 1;
+					}
+					if (i - 1 >= 0)
+					{
+						summ_r += (int)m_pixels[i - 1][j].r;
+						summ_g += (int)m_pixels[i - 1][j].g;
+						summ_b += (int)m_pixels[i - 1][j].b;
+						kol += 1;
+					}
+					if ((i - 1 >= 0) && (j + 1 <= m_width))
+					{
+						summ_r += (int)m_pixels[i - 1][j + 1].r;
+						summ_g += (int)m_pixels[i - 1][j + 1].g;
+						summ_b += (int)m_pixels[i - 1][j + 1].b;
+						kol += 1;
+					}
+					if (j + 1 <= m_width)
+					{
+						summ_r += (int)m_pixels[i][j + 1].r;
+						summ_g += (int)m_pixels[i][j + 1].g;
+						summ_b += (int)m_pixels[i][j + 1].b;
+						kol += 1;
+					}
+					if ((j + 1 <= m_width) && (i + 1 <= m_height))
+					{
+						summ_r += (int)m_pixels[i + 1][j + 1].r;
+						summ_g += (int)m_pixels[i + 1][j + 1].g;
+						summ_b += (int)m_pixels[i + 1][j + 1].b;
+						kol += 1;
+					}
+					if (i + 1 <= m_height)
+					{
+						summ_r += (int)m_pixels[i + 1][j].r;
+						summ_g += (int)m_pixels[i + 1][j].g;
+						summ_b += (int)m_pixels[i + 1][j].b;
+						kol += 1;
+					}
+					if ((j - 1 >= 0) && (i + 1 <= m_height))
+					{
+						summ_r += (int)m_pixels[i + 1][j - 1].r;
+						summ_g += (int)m_pixels[i + 1][j - 1].g;
+						summ_b += (int)m_pixels[i + 1][j - 1].b;
+						kol += 1;
+					}
+					if (j - 1 >= 0)
+					{
+						summ_r += (int)m_pixels[i][j - 1].r;
+						summ_g += (int)m_pixels[i][j - 1].g;
+						summ_b += (int)m_pixels[i][j - 1].b;
+						kol += 1;
+					}
+
+					m_pixels[i][j].r = unsigned char(summ_r / kol);
+					m_pixels[i][j].g = unsigned char(summ_g / kol);
+					m_pixels[i][j].b = unsigned char(summ_b / kol);
+				}
+			}
+	}
+
 }

@@ -19,6 +19,10 @@ namespace image
 		};
 
 		BMP::BMP();
+		BMP::BMP(int width, int height);
+		BMP::BMP(const BMP& bmp);
+
+		~BMP();
 
 		//READING FILE
 		void Read(const std::string& filename);
@@ -36,7 +40,9 @@ namespace image
 
 		void Rotate(double angle);
 
-		~BMP();
+		bool ItsBlack(int x, int y);
+
+		void Fix();
 		
 	private:
 

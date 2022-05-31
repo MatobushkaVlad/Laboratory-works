@@ -6,6 +6,12 @@ namespace mt::math
 	//#define DEBUG
 
 	template<typename T, int N, int M>
+	struct MasWrapper
+	{
+		T mas[N][M];
+	};
+
+	template<typename T, int N, int M>
 	class Matrix
 	{
 	public:
@@ -26,6 +32,30 @@ namespace mt::math
 			for (int i = 0; i < m_n; i++)
 				for (int j = 0; j < m_m; j++)
 					m_mat[i][j] = 0;
+		}
+
+		Matrix(const T mas[N][M])
+		{
+#ifdef MY_DEBUG
+			std::cout << "Constructor" << std::endl;
+#endif
+			m_n = N;
+			m_m = M;
+			for (int i = 0; i < m_n; i++)
+				for (int j = 0; j < m_m; j++)
+					m_mat[i][j] = mas[i][j];
+		}
+
+		Matrix(const MasWrapper<T, N, M>& mas)
+		{
+#ifdef MY_DEBUG
+			std::cout << "Constructor" << std::endl;
+#endif
+			m_n = N;
+			m_m = M;
+			for (int i = 0; i < m_n; i++)
+				for (int j = 0; j < m_m; j++)
+					m_mat[i][j] = mas.mas[i][j];
 		}
 
 		//Copy constructor
