@@ -179,6 +179,20 @@ namespace mt::math
 					d = (m_mat[0][0] * m_mat[1][1] * m_mat[2][2] + m_mat[1][0] * m_mat[2][1] * m_mat[0][2] + m_mat[0][1] * m_mat[1][2] * m_mat[2][0] - m_mat[0][2] * m_mat[1][1] * m_mat[2][0] - m_mat[1][2] * m_mat[2][1] * m_mat[0][0] - m_mat[0][1] * m_mat[1][0] * m_mat[2][2]);
 					return d;
 				}
+				else
+				{
+					T d = 1;
+					Gauss();
+					for(int i = 0; i < m_n; i++)
+						for (int j = 0; j < m_m; j++)
+						{
+							if (i == j)
+							{
+								d = d * m_mat[i][j];
+							}
+						}
+				}
+
 			}
 		}
 
@@ -334,6 +348,7 @@ namespace mt::math
 	using Mat23i = Matrix<int, 2, 3>;
 	using Mat22d = Matrix<double, 2, 2>;
 	using Mat33d = Matrix<double, 3, 3>;
+	using Mat44d = Matrix<double, 4, 4>;
 
 	using Mat23d = Matrix<double, 2, 3>;
 	using Mat34d = Matrix<double, 3, 4>;

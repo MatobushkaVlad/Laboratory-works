@@ -8,6 +8,7 @@ using mt::math::Vec12d;
 
 using mt::math::Mat22d;
 using mt::math::Mat33d;
+using mt::math::Mat44d;
 
 using mt::math::Mat23d;
 using mt::math::Mat34d;
@@ -21,6 +22,13 @@ using mt::math::Mat1011d;
 
 int main()
 {
+	Mat44d D({ {
+		{3,6,7,4},
+		{1,7,8,4},
+		{5,9,10,5},
+		{78,53,7,2}
+} });
+
 	Mat34d B({ {
 		{1,3,4,60},
 		{5,9,10,98},
@@ -44,9 +52,11 @@ int main()
 
 	//B.Gauss();
 
-	C.Gauss();
+	//C.Gauss();
 
-	std::cout << C;
+	//D.Det();
+
+	std::cout << D.Det();
 
 	return 0;
 }
